@@ -3,12 +3,12 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.amap.api.maps.MapView
+    <com.unis.longformforlogistics.map.SelfAMapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1">
-    </com.amap.api.maps.MapView>
+    </com.unis.longformforlogistics.map.SelfAMapView>
 
     <LinearLayout
         android:layout_width="match_parent"

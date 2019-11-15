@@ -1,24 +1,17 @@
 package com.unis.longformforlogistics.map;
 
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 
 import com.amap.api.location.AMapLocation;
-import com.amap.api.location.AMapLocationClient;
-import com.amap.api.location.AMapLocationClientOption;
-import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdate;
 import com.amap.api.maps.CameraUpdateFactory;
-import com.amap.api.maps.MapView;
-import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.navi.model.NaviLatLng;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.route.BusRouteResult;
@@ -41,37 +34,32 @@ import androidx.annotation.Nullable;
 public class AMapActivity extends CheckPermissionsActivity implements RouteSearch.OnRouteSearchListener {
     private static final String TAG = AMapActivity.class.getSimpleName();
 
-    private AMap aMap;
-    private MapView mAMapView;
-    private RouteSearch mRouteSearch;
-    private AMapLocationClient mLocationClient;
-    private DriveRouteResult mDriveRouteResult = null;
-
     private final int ROUTE_TYPE_BUS = 1;
     private final int ROUTE_TYPE_DRIVE = 2;
     private final int ROUTE_TYPE_WALK = 3;
     private final int ROUTE_TYPE_CROSSTOWN = 4;
 
-    private LatLonPoint mCurrentPoint = null; //new LatLonPoint(24.48469, 118.183743)
+    private AMap aMap;
+    private SelfAMapView mAMapView;
+    private RouteSearch mRouteSearch;
+    private DriveRouteResult mDriveRouteResult = null;
+
     private LatLonPoint mStartPoint = new LatLonPoint(39.942295, 116.335891);
     private LatLonPoint mEndPoint = new LatLonPoint(25.48469, 119.183743);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getSupportActionBar().hide();
+        getSupportActionBar().setTitle("订单详情");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_amap);
         initViews(savedInstanceState);
         initMap();
         registerListener();
-        if (mCurrentPoint == null) {
-            startLocation();
-        }
     }
 
     private void initViews(@Nullable Bundle savedInstanceState) {
-        mAMapView = (MapView) findViewById(R.id.mapView);
+        mAMapView = (SelfAMapView) findViewById(R.id.mapView);
         mAMapView.onCreate(savedInstanceState);
 
         findViewById(R.id.btn_cal_route).setOnClickListener(new View.OnClickListener() {
@@ -101,37 +89,6 @@ public class AMapActivity extends CheckPermissionsActivity implements RouteSearc
             aMap = mAMapView.getMap();
         }
 
-        aMap.setMapTextZIndex(2);//地图文字的Z轴指数,设置为2可以将地图底图文字设置在添加的覆盖物之上
-
-        UiSettings uiSettings = aMap.getUiSettings();//地图的UI设置控制器
-        uiSettings.setCompassEnabled(false);// 设置指南针是否显示
-        uiSettings.setZoomControlsEnabled(true);// 设置缩放按钮是否显示
-        uiSettings.setScaleControlsEnabled(true);// 设置比例尺是否显示
-        uiSettings.setRotateGesturesEnabled(true);// 设置地图旋转是否可用
-        uiSettings.setTiltGesturesEnabled(true);// 设置地图倾斜是否可用
-        uiSettings.setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
-
-        MyLocationStyle myLocationStyle = new MyLocationStyle();
-        //设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效。单位为秒。
-        myLocationStyle.interval(3000);
-        //设置连续定位、蓝点不会移动到地图中心点，定位点依照设备方向旋转，并且蓝点会跟随设备移动。
-        //具体场景可根据高德API查看
-        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
-        myLocationStyle.showMyLocation(true);//显示定位蓝点
-        //设置圆圈颜色
-        myLocationStyle.radiusFillColor(0x70ffffff);
-        //设置边框颜色
-        myLocationStyle.strokeColor(0xffffffff);
-        aMap.setMyLocationStyle(myLocationStyle);//关联myLocationStyle
-        //开启定位,设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认false。
-        aMap.setMyLocationEnabled(true);
-        //监听定位信息的回调
-        aMap.setOnMyLocationChangeListener(new AMap.OnMyLocationChangeListener() {
-            @Override
-            public void onMyLocationChange(Location location) {
-            }
-        });
-
         mRouteSearch = new RouteSearch(this);
         mRouteSearch.setRouteSearchListener(this);
     }
@@ -142,43 +99,8 @@ public class AMapActivity extends CheckPermissionsActivity implements RouteSearc
 
     }
 
-    void startLocation(){
-        if(null == mLocationClient){
-            mLocationClient = new AMapLocationClient(this.getApplicationContext());
-        }
-
-        AMapLocationClientOption locationClientOption = new AMapLocationClientOption();
-        // 地址信息
-        locationClientOption.setInterval(1000);
-        locationClientOption.setNeedAddress(true);
-        mLocationClient.setLocationOption(locationClientOption);
-        mLocationClient.setLocationListener(locationSingleListener);
-        mLocationClient.startLocation();
-    }
-
-    /**
-     * 停止单次客户端
-     */
-    void stopLocation(){
-        if(null != mLocationClient){
-            mLocationClient.stopLocation();
-        }
-    }
-
-    AMapLocationListener locationSingleListener = new AMapLocationListener() {
-        @Override
-        public void onLocationChanged(AMapLocation location) {
-            Log.d(TAG, "定位位置：" + location.toString());
-            if (location != null) {
-                mCurrentPoint = new LatLonPoint(location.getLatitude(), location.getLongitude());
-                moveToPosition(new LatLng(location.getLatitude(), location.getLongitude()));
-                stopLocation();
-            }
-        }
-    };
-
     public void searchRouteResult(int routeType, int mode) {
-        mStartPoint = mCurrentPoint;
+        mStartPoint = getCurrentPoint();
         if (mStartPoint == null) {
             ToastUtil.show(this, "起点未设置");
             return;
@@ -192,6 +114,11 @@ public class AMapActivity extends CheckPermissionsActivity implements RouteSearc
             RouteSearch.DriveRouteQuery query = new RouteSearch.DriveRouteQuery(fromAndTo, mode, null, null, "");
             mRouteSearch.calculateDriveRouteAsyn(query);// 异步路径规划驾车模式查询
         }
+    }
+
+    private LatLonPoint getCurrentPoint() {
+        AMapLocation currentLocation = mAMapView.getCurrentPosition();
+        return new LatLonPoint(currentLocation.getLatitude(), currentLocation.getLongitude());
     }
 
     public void moveToPosition(LatLng latLng) {
@@ -210,18 +137,12 @@ public class AMapActivity extends CheckPermissionsActivity implements RouteSearc
     protected void onPause() {
         super.onPause();
         mAMapView.onPause();
-//        停止导航之后，会触及底层stop，然后就不会再有回调了，但是讯飞当前还是没有说完的半句话还是会说完
-//        mAMapNavi.stopNavi();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mAMapView.onDestroy();
-        if(mLocationClient != null){
-            mLocationClient.onDestroy();
-            mLocationClient = null;
-        }
     }
 
     @Override
