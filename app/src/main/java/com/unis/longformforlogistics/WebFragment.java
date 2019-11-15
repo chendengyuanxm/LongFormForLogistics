@@ -27,18 +27,15 @@ import androidx.fragment.app.Fragment;
  * Author:Arnold
  * Date:2019/9/16 17:02
  */
-public class WebFragment extends Fragment implements PageFinishedListener {
+public class WebFragment extends Fragment {
     private Activity context;
     private View mRootView;
     private SelfWebView mWebView;
     private JsBridge jsBridge;
 
-    private String pageId;
-
     public static WebFragment getFragment() {
         WebFragment fragment = new WebFragment();
         Bundle bundle = new Bundle();
-//        bundle.putString("page", pageId);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -47,7 +44,6 @@ public class WebFragment extends Fragment implements PageFinishedListener {
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = (Activity) context;
-//        this.pageId = getArguments().getString("page");
     }
 
     @Nullable
@@ -62,7 +58,6 @@ public class WebFragment extends Fragment implements PageFinishedListener {
         jsBridge = new JsBridge(this);
         mWebView = new SelfWebView(context);
         mWebView.init(jsBridge);
-        mWebView.setPageFinishedListener(this);
         mWebView.addJsModule(new JsModuleScan());
 
         FrameLayout webContainer = mRootView.findViewById(R.id.container);
@@ -70,45 +65,6 @@ public class WebFragment extends Fragment implements PageFinishedListener {
 
         mWebView.loadUrl("file:///android_asset/www/index.html");
 //        mWebView.loadUrl("http://192.168.199.88:8024");
-    }
-
-    private void callJs(String js) {
-        final int version = Build.VERSION.SDK_INT;
-        if (version < 18) {
-            mWebView.loadUrl(js);
-        } else {
-            mWebView.evaluateJavascript(js, new ValueCallback<String>() {
-                @Override
-                public void onReceiveValue(String value) {
-                    //此处为 js 返回的结果
-                    Log.d("Devin", value);
-                }
-            });
-        }
-    }
-
-    @Override
-    public void onPageFinished(WebView view, String url) {
-        Log.d("devin", "onPageFinished");
-//        loadPage();
-    }
-
-    private void loadPage() {
-        mWebView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (pageId != null && !"".equals(pageId)) {
-                    String js = String.format("javascript:app.renderWebPage('%s','%s', '%s','%s', {'username':'longform'})",
-                            App.mAppKey,
-                            pageId,
-                            App.mRole,
-                            App.mToken
-                    );
-                    Log.e("Devin", js);
-                    callJs(js);
-                }
-            }
-        }, 100);
     }
 
     @Override

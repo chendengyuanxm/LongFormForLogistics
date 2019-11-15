@@ -29,7 +29,7 @@ public class CallbackContext {
         mMainHandler.post(new Runnable() {
             @Override
             public void run() {
-                String js = String.format("javascript:%s('%s', '%s', %b', '%s')",
+                String js = String.format("javascript:%s('%s', %b', '%s')",
                         callbackName,
                         serviceId,
                         sucess,

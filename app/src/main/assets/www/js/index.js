@@ -86,9 +86,6 @@ var app = {
              id: "10",
              name: "arnold"
          };
-        // var result = scanModule.scan(params);
-        // console.log("result:" + result.barcode);
-
         var success = function(message){
             console.log("success = "+message);
         };
@@ -96,8 +93,7 @@ var app = {
             console.log("fail = "+message);
         };
 
-//        this.nativeExec2(success, fail, "scanModule", "scan", params);
-        this.nativeExec3(success, fail, "/scanModule/aa/scan", params);
+        this.nativeExec3(success, fail, "/scanModule/scan", params);
     },
 
     nativeExec: function (success, fail, module, method, params) {
@@ -124,7 +120,7 @@ var app = {
     },
 
     nativeExec3: function (success, fail, path, params) {
-        var callbackId = module+baseId++;
+        var callbackId = path + baseId++;
         var callbackName = "nativeCallback";
         console.log(callbackId);
         if (success || fail) {

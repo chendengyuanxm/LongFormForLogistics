@@ -1,24 +1,24 @@
 package com.unis.longformforlogistics.jsmodule.impl;
 
 import android.content.Intent;
-import android.net.Uri;
-import android.provider.Settings;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.View;
 
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.Poi;
+import com.amap.api.navi.AmapNaviPage;
+import com.amap.api.navi.AmapNaviParams;
+import com.amap.api.navi.AmapNaviType;
+import com.amap.api.navi.INaviInfoCallback;
+import com.amap.api.navi.model.AMapNaviLocation;
+//import com.unis.longformforlogistics.MyFlutterActivity;
 import com.unis.longformforlogistics.jsmodule.IScanModule;
+import com.unis.longformforlogistics.map.AMapActivity;
 import com.unis.longformforlogistics.model.GetBarcodeTypeResponseEntity;
 import com.unis.longformforlogistics.model.ScanRequestEntity;
-import com.unis.longformforlogistics.model.ScanResponseEntity;
 import com.unis.longformlib.AbstractJsModule;
 import com.unis.longformlib.CallbackContext;
 import com.unis.longformlib.utils.GsonUtil;
-
-import org.yaml.snakeyaml.scanner.Constant;
-
-import java.util.List;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * Author:Arnold
@@ -30,10 +30,21 @@ public class JsModuleScan extends AbstractJsModule implements IScanModule {
 
     public JsModuleScan(){}
 
+    LatLng p1 = new LatLng(39.993266, 116.473193);//首开广场
+    LatLng p2 = new LatLng(39.917337, 116.397056);//故宫博物院
+    LatLng p3 = new LatLng(39.904556, 116.427231);//北京站
+    LatLng p4 = new LatLng(39.773801, 116.368984);//新三余公园(南5环)
+    LatLng p5 = new LatLng(40.041986, 116.414496);//立水桥(北5环)
+
     @Override
     public void scan(ScanRequestEntity req, CallbackContext callbackContext) {
         Log.i(TAG, "scan barcode, args = " + req);
         this.callbackContext = callbackContext;
+//        Intent intent = new Intent(context, MyFlutterActivity.class);
+//        context.startActivity(intent);
+
+        Intent intent = new Intent(context, AMapActivity.class);
+        context.startActivity(intent);
     }
 
     @Override
