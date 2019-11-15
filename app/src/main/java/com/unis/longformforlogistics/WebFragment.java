@@ -14,9 +14,14 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 
 import com.unis.longformforlogistics.jsmodule.impl.JsModuleScan;
+import com.unis.longformforlogistics.jsmodule.impl.OrderModule;
+import com.unis.longformlib.AbstractJsModule;
 import com.unis.longformlib.JsBridge;
 import com.unis.longformlib.webview.PageFinishedListener;
 import com.unis.longformlib.webview.SelfWebView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -58,13 +63,20 @@ public class WebFragment extends Fragment {
         jsBridge = new JsBridge(this);
         mWebView = new SelfWebView(context);
         mWebView.init(jsBridge);
-        mWebView.addJsModule(new JsModuleScan());
+        initJsModules();
 
         FrameLayout webContainer = mRootView.findViewById(R.id.container);
         webContainer.addView(mWebView);
 
         mWebView.loadUrl("file:///android_asset/www/index.html");
 //        mWebView.loadUrl("http://192.168.199.88:8024");
+    }
+
+    private void initJsModules() {
+        List<AbstractJsModule> modules = new ArrayList<>();
+        modules.add(new JsModuleScan());
+        modules.add(new OrderModule());
+        mWebView.addJsModules(modules);
     }
 
     @Override

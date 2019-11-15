@@ -2,16 +2,8 @@ package com.unis.longformforlogistics.jsmodule.impl;
 
 import android.content.Intent;
 import android.util.Log;
-import android.view.View;
 
 import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.Poi;
-import com.amap.api.navi.AmapNaviPage;
-import com.amap.api.navi.AmapNaviParams;
-import com.amap.api.navi.AmapNaviType;
-import com.amap.api.navi.INaviInfoCallback;
-import com.amap.api.navi.model.AMapNaviLocation;
-//import com.unis.longformforlogistics.MyFlutterActivity;
 import com.unis.longformforlogistics.jsmodule.IScanModule;
 import com.unis.longformforlogistics.map.AMapActivity;
 import com.unis.longformforlogistics.model.GetBarcodeTypeResponseEntity;
@@ -19,6 +11,8 @@ import com.unis.longformforlogistics.model.ScanRequestEntity;
 import com.unis.longformlib.AbstractJsModule;
 import com.unis.longformlib.CallbackContext;
 import com.unis.longformlib.utils.GsonUtil;
+
+//import com.unis.longformforlogistics.MyFlutterActivity;
 
 /**
  * Author:Arnold
